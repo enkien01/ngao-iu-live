@@ -49,7 +49,7 @@
         <hr class="border-slate-800">
         <div class="space-y-2">
             <label class="text-[9px] font-bold text-slate-500 uppercase">Link Studio Mini-App</label>
-            <input type="text" id="studioLinkInput" placeholder="https://ai.studio/apps/ce2d7b0e-45a7-499f-9b6d-8e33db158288" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-[10px] text-blue-400 outline-none">
+            <input type="text" id="studioLinkInput" placeholder="Link Studio App..." class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-[10px] text-blue-400 outline-none">
         </div>
         <div class="space-y-2">
             <label class="text-[9px] font-bold text-slate-500 uppercase">Nhập ID/Link Giọng đọc ngoài</label>
@@ -146,7 +146,13 @@
 
     <script>
         // Sửa: Thêm trường externalVoice vào store
-        let store = { categories: ["Thời trang", "Gia dụng"], products: [], studioLink: "", externalVoice: "", emotion: 'normal', selectedVoice: "" };
+        let store = { 
+    categories: ["Thời trang", "Gia dụng"], 
+    products: [], 
+    studioLink: "https://aistudio.google.com/u/1/apps/ce2d7b0e-45a7-499f-9b6d-8e33db158288?pli=1&showPreview=true&showAssistant=true", 
+    emotion: 'normal', 
+    selectedVoice: "" 
+};
         let currentUser = "", tempImg = "", editIdx = null, voices = [];
         let isLive = false, currentFilter = "All";
         let nextTimeout = null; // Quản lý thời gian chờ giữa các câu
@@ -245,12 +251,16 @@
         }
 
         function openStudio() {
-            if(store.studioLink) {
-                window.open(store.studioLink, '_blank');
-            } else {
-                alert("Chưa có link Studio trong cài đặt!");
-            }
-        }
+    // Ưu tiên lấy link từ ô nhập, nếu ô nhập trống thì lấy link mặc định trong store
+    let linkInput = document.getElementById('studioLinkInput');
+    let targetLink = (linkInput && linkInput.value.trim() !== "") ? linkInput.value : store.studioLink;
+
+    if (targetLink) {
+        window.open(targetLink, '_blank');
+    } else {
+        alert("Chưa có link Studio!");
+    }
+}
 
         function saveSettings() {
             store.studioLink = document.getElementById('studioLinkInput').value.trim();
