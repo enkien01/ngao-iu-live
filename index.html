@@ -156,7 +156,7 @@
         let currentUser = "", tempImg = "", editIdx = null, voices = [];
         let isLive = false, currentFilter = "All";
         let nextTimeout = null; // Quản lý thời gian chờ giữa các câu
-
+	let wakeLock = null; // Biến giữ trạng thái khóa màn hình
         function loadVoices() {
             voices = window.speechSynthesis.getVoices().filter(v => v.lang.includes('vi'));
             const select = document.getElementById('voiceSelect');
@@ -227,20 +227,32 @@
             });
         }
 
-        function toggleLive() {
-            isLive = !isLive;
-            const btn = document.getElementById('btnStart');
-            if(isLive) {
-                const activeOnes = store.products.filter(p => p.active);
-                if(!activeOnes.length) { isLive = false; return alert("Hãy bật ít nhất 1 sản phẩm!"); }
-                btn.innerText = "DỪNG PHÁT"; btn.classList.replace('bg-red-600', 'bg-slate-700');
-                runRandom();
-            } else {
-                btn.innerText = "BẮT ĐẦU PHÁT"; btn.classList.replace('bg-slate-700', 'bg-red-600');
-                clearTimeout(nextTimeout);
-                window.speechSynthesis.cancel();
-            }
-        }
+       function toggleLive() {
+    isLive = !isLive;
+    const btn = document.getElementById('btnStart');
+    
+    if(isLive) {
+        const activeOnes = store.products.filter(p => p.active);
+        if(!activeOnes.length) { isLive = false; return alert("Hãy bật SP!"); }
+        
+        btn.innerText = "DỪNG PHÁT"; 
+        btn.classList.replace('bg-red-600', 'bg-slate-700');
+        
+        // Kích hoạt giữ màn hình sáng khi bắt đầu
+        toggleWakeLock(true); 
+        
+        runRandom();
+    } else {
+        btn.innerText = "BẮT ĐẦU PHÁT"; 
+        btn.classList.replace('bg-slate-700', 'bg-red-600');
+        
+        // Nhả khóa màn hình khi dừng
+        toggleWakeLock(false); 
+        
+        clearTimeout(nextTimeout); 
+        window.speechSynthesis.cancel();
+    }
+}
 
         // Sửa: Chức năng chọn tất cả
         function toggleAllProducts() {
@@ -270,8 +282,20 @@
             alert("Đã lưu cấu hình!");
             toggleSettings();
         }
-
+	
         // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
+	async function toggleWakeLock(on) {
+    try {
+        if (on && 'wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+        } else if (wakeLock) {
+            await wakeLock.release();
+            wakeLock = null;
+        }
+    } catch (err) {
+        console.log("WakeLock Error: " + err.message);
+    }
+}
         function processImport() {
             const name = document.getElementById('newPName').value.trim();
             const cat = document.getElementById('newPCat').value;
