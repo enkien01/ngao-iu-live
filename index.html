@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ngao IU - v22 Ultimate</title>
+    <title>Ngao IU - v22 Ultimate Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
     <style>
         body { background: #020617; color: #f8fafc; font-family: sans-serif; }
         .glass { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
@@ -13,9 +17,9 @@
         .product-card.active { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
         .thumb { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; }
         .mode-btn.active { background: #3b82f6; color: white; }
-        .live-glow { animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         input[type="range"] { accent-color: #ef4444; cursor: pointer; }
+        /* Tối ưu cho mobile */
+        textarea, input { font-size: 16px !important; } 
     </style>
 </head>
 <body class="pb-32">
@@ -24,15 +28,16 @@
         <div class="w-full max-w-sm glass p-8 rounded-[2.5rem] space-y-6">
             <div class="w-16 h-16 bg-red-600 rounded-2xl mx-auto flex items-center justify-center text-3xl font-black italic text-white">N</div>
             <h2 class="text-xl font-black uppercase">Ngao IU v22</h2>
+            <p class="text-[10px] text-slate-500 uppercase font-bold">Dữ liệu sẽ đồng bộ theo tên tài khoản</p>
             <input type="text" id="user" placeholder="Tên tài khoản..." class="w-full bg-slate-900 border border-slate-800 p-4 rounded-2xl outline-none text-white">
-            <button onclick="handleLogin()" class="w-full py-4 bg-red-600 rounded-2xl font-black uppercase text-white shadow-lg">Vào hệ thống</button>
+            <button id="btnLogin" onclick="handleLogin()" class="w-full py-4 bg-red-600 rounded-2xl font-black uppercase text-white shadow-lg">Vào hệ thống</button>
         </div>
     </div>
 
     <nav class="p-4 glass sticky top-0 z-50 flex justify-between items-center border-b border-slate-800">
         <div class="flex items-center gap-3">
             <div id="userAvatar" class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white">AD</div>
-            <h1 id="welcomeUser" class="text-[10px] font-black uppercase">Admin</h1>
+            <h1 id="welcomeUser" class="text-[10px] font-black uppercase italic">Admin</h1>
         </div>
         <div class="flex gap-2">
             <button onclick="openStudio()" class="bg-blue-600 px-4 py-2 rounded-full text-[9px] font-black uppercase text-white">Studio</button>
@@ -41,16 +46,15 @@
     </nav>
 
     <div class="max-w-xl mx-auto p-4 space-y-6">
-
         <div class="glass p-5 rounded-[2rem] space-y-4">
             <div class="grid grid-cols-2 gap-3">
                 <input type="text" id="newPName" placeholder="Tên sản phẩm..." class="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-xs outline-none text-white">
                 <button onclick="document.getElementById('imgUpload').click()" class="bg-slate-800 border border-dashed border-slate-600 rounded-2xl text-[10px] font-bold">
-                    <span id="imgStatus" class="text-slate-400">TẢI ẢNH</span>
+                    <span id="imgStatus" class="text-slate-400 uppercase">Tải ảnh</span>
                 </button>
                 <input type="file" id="imgUpload" accept="image/*" class="hidden" onchange="previewImg(this)">
             </div>
-            <textarea id="newPJson" placeholder="Dán nội dung JSON kịch bản..." class="w-full h-24 bg-slate-950 border border-slate-800 p-4 rounded-2xl text-[10px] outline-none text-white"></textarea>
+            <textarea id="newPJson" placeholder="Dán JSON kịch bản..." class="w-full h-24 bg-slate-950 border border-slate-800 p-4 rounded-2xl text-[10px] outline-none text-white"></textarea>
             <button onclick="processImport()" class="w-full py-4 bg-blue-600 rounded-2xl font-black text-[11px] uppercase text-white">Lưu vào kho hàng</button>
         </div>
 
@@ -59,7 +63,6 @@
                 <button id="modeOnline" onclick="setMode('online')" class="mode-btn active p-3 rounded-2xl text-[10px] font-bold uppercase">Giọng Online</button>
                 <button id="modeOffline" onclick="setMode('offline')" class="mode-btn p-3 rounded-2xl text-[10px] font-bold uppercase">Giọng Offline</button>
             </div>
-
             <div class="space-y-4 bg-slate-950/50 p-4 rounded-2xl border border-slate-800/50">
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1">
@@ -72,18 +75,16 @@
                     </div>
                 </div>
                 <div class="space-y-1">
-                    <div class="flex justify-between text-[9px] font-black text-slate-400 uppercase"><span>Âm lượng giọng đọc</span><span id="voiceVolVal">100%</span></div>
+                    <div class="flex justify-between text-[9px] font-black text-slate-400 uppercase"><span>Âm lượng giọng</span><span id="voiceVolVal">100%</span></div>
                     <input type="range" id="voiceVol" min="0" max="1" step="0.1" value="1.0" oninput="updateUI()" class="w-full">
                 </div>
             </div>
-
             <div id="offlineConfig" class="hidden"><select id="voiceSelect" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-2xl text-xs text-white outline-none"></select></div>
-
             <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-4">
                 <div class="flex items-center justify-between">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" id="useMusic" class="w-4 h-4 accent-red-600">
-                        <span class="text-[10px] font-black uppercase text-slate-400">Dùng nhạc nền</span>
+                        <span class="text-[10px] font-black uppercase text-slate-400">Nhạc nền</span>
                     </label>
                     <button onclick="document.getElementById('bgMusicInput').click()" class="text-[8px] bg-slate-800 px-3 py-1.5 rounded-lg text-white">CHỌN FILE</button>
                 </div>
@@ -109,11 +110,11 @@
     <div id="editModal" class="fixed inset-0 z-[110] bg-black/95 hidden p-6">
         <div class="max-w-xl mx-auto glass p-6 rounded-[2rem] space-y-4 h-full flex flex-col">
             <div class="flex justify-between items-center border-b border-slate-800 pb-4">
-                <h3 id="editTitle" class="font-black text-sm uppercase text-red-500 tracking-wider">CHỈNH SỬA KỊCH BẢN</h3>
+                <h3 id="editTitle" class="font-black text-sm uppercase text-red-500">CHỈNH SỬA</h3>
                 <button onclick="closeEdit()" class="text-slate-500 text-xl p-2"><i class="fas fa-times"></i></button>
             </div>
             <div id="scriptItems" class="flex-1 overflow-y-auto space-y-3 pr-2 py-2"></div>
-            <button onclick="saveEdit()" class="w-full py-4 bg-green-600 rounded-2xl font-black uppercase text-white shadow-lg">LƯU THAY ĐỔI</button>
+            <button onclick="saveEdit()" class="w-full py-4 bg-green-600 rounded-2xl font-black uppercase text-white">LƯU THAY ĐỔI</button>
         </div>
     </div>
 
@@ -121,34 +122,80 @@
     <audio id="bgMusic" loop crossOrigin="anonymous"></audio>
 
     <script>
+        // --- CẤU HÌNH FIREBASE TỪ ẢNH CỦA BẠN ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBJ6CBUOkK78XHF0mTJ-SMjCKfhxjzEfY4",
+            authDomain: "ngao-iu-live.firebaseapp.com",
+            projectId: "ngao-iu-live",
+            storageBucket: "ngao-iu-live.firebasestorage.app",
+            messagingSenderId: "395104205957",
+            appId: "1:395104205957:web:3b781846a843d175a6fdec",
+            databaseURL: "https://ngao-iu-live-default-rtdb.firebaseio.com"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const rdb = firebase.database();
+
         let db = [], currentUser = "", currentMode = 'online', tempImg = "", editIdx = null;
         let isLive = false, voices = [];
-        let miniLink = localStorage.getItem('ngao_iu_link') || "https://ai.studio/apps/ce2d7b0e-45a7-499f-9b6d-8e33db158288";
+        let miniLink = "https://ai.studio/apps/ce2d7b0e-45a7-499f-9b6d-8e33db158288";
 
         const ttsCloud = document.getElementById('ttsCloud');
         const bgMusic = document.getElementById('bgMusic');
 
-        // Worker chạy ngầm để không bị ngắt khi tắt màn hình
+        // Worker chạy ngầm
         const workerBlob = new Blob([`let t=null;self.onmessage=function(e){if(e.data.action==='start'){clearInterval(t);t=setInterval(()=>{self.postMessage('tick')},e.data.interval*1000)}else if(e.data.action==='stop'){clearInterval(t)}}`], {type:'text/javascript'});
         const worker = new Worker(URL.createObjectURL(workerBlob));
         worker.onmessage = (e) => { if(isLive && e.data === 'tick') runNext(); };
 
+        // --- HÀM ĐĂNG NHẬP VỚI ĐỒNG BỘ CLOUD ---
         function handleLogin() {
             const user = document.getElementById('user').value.trim();
             if (!user) return;
+            
+            const btn = document.getElementById('btnLogin');
+            btn.innerText = "ĐANG TẢI...";
+            btn.disabled = true;
+
             currentUser = user;
-            document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('welcomeUser').innerText = user;
-            db = JSON.parse(localStorage.getItem('db_v22_' + user)) || [];
-            renderList(); loadVoices();
+
+            // Tải dữ liệu từ mây về
+            rdb.ref('users/' + currentUser).once('value', (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    db = data;
+                } else {
+                    // Nếu mây trống thì lấy từ máy hiện tại
+                    db = JSON.parse(localStorage.getItem('db_v22_' + user)) || [];
+                }
+                
+                document.getElementById('loginScreen').classList.add('hidden');
+                renderList(); 
+                loadVoices();
+            }).catch(err => {
+                alert("Lỗi kết nối Firebase: " + err.message);
+                btn.innerText = "THỬ LẠI";
+                btn.disabled = false;
+            });
+        }
+
+        // --- HÀM LƯU DỮ LIỆU ---
+        function sync() {
+            renderList();
+            if(currentUser) {
+                // Đẩy lên mây Firebase
+                rdb.ref('users/' + currentUser).set(db);
+                // Lưu dự phòng ở máy
+                localStorage.setItem('db_v22_' + currentUser, JSON.stringify(db));
+            }
         }
 
         function updateUI() {
             document.getElementById('rateVal').innerText = document.getElementById('voiceRate').value;
             document.getElementById('pitchVal').innerText = document.getElementById('voicePitch').value;
-            const vVol = document.getElementById('voiceVol').value;
-            document.getElementById('voiceVolVal').innerText = Math.round(vVol * 100) + "%";
-            ttsCloud.volume = vVol;
+            ttsCloud.volume = document.getElementById('voiceVol').value;
+            document.getElementById('voiceVolVal').innerText = Math.round(ttsCloud.volume * 100) + "%";
         }
 
         function updateMusicVol() {
@@ -176,7 +223,7 @@
             const vVol = document.getElementById('voiceVol').value;
             const useMusic = document.getElementById('useMusic').checked;
 
-            if (useMusic) bgMusic.volume = 0.05; // Giảm nhạc khi đọc
+            if (useMusic) bgMusic.volume = 0.05; 
 
             if (currentMode === 'online') {
                 ttsCloud.src = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleanText)}&tl=vi&client=tw-ob&ttsspeed=${rate}`;
@@ -220,7 +267,6 @@
             }
         }
 
-        // --- HÀM TEST THỬ (REVIEW) ---
         function testLine(btn, text) {
             const icon = btn.querySelector('i');
             icon.classList.replace('fa-play', 'fa-spinner'); icon.classList.add('fa-spin');
@@ -229,7 +275,6 @@
             });
         }
 
-        // --- QUẢN LÝ ---
         function processImport() {
             const name = document.getElementById('newPName').value;
             let raw = document.getElementById('newPJson').value.trim();
@@ -298,7 +343,6 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
-        function sync() { localStorage.setItem('db_v22_' + currentUser, JSON.stringify(db)); renderList(); }
         function toggleActive(i) { db[i].active = !db[i].active; sync(); }
         function deleteProduct(i) { if(confirm('Xóa sản phẩm này?')) { db.splice(i, 1); sync(); } }
         function toggleSettings() { document.getElementById('settingsPanel')?.classList.toggle('hidden'); }
