@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ngao IU - v22 Offline Pro + Studio</title>
+    <title>Ngao IU - v22 Pro + Image Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -22,7 +22,7 @@
     <div id="loginScreen" class="fixed inset-0 z-[100] bg-slate-950 flex items-center justify-center p-6 text-center">
         <div class="w-full max-w-sm glass p-8 rounded-[2.5rem] space-y-6">
             <div class="w-16 h-16 bg-red-600 rounded-2xl mx-auto flex items-center justify-center text-3xl font-black italic text-white">N</div>
-            <h2 class="text-xl font-black uppercase">Ngao IU v22</h2>
+            <h2 class="text-xl font-black uppercase italic">Ngao IU v22</h2>
             <input type="text" id="user" placeholder="Tên tài khoản..." class="w-full bg-slate-900 border border-slate-800 p-4 rounded-2xl outline-none text-white text-center">
             <button onclick="handleLogin()" class="w-full py-4 bg-red-600 rounded-2xl font-black uppercase text-white shadow-lg">Vào hệ thống</button>
         </div>
@@ -30,12 +30,12 @@
 
     <nav class="p-4 glass sticky top-0 z-50 flex justify-between items-center border-b border-slate-800">
         <div class="flex items-center gap-3">
-            <div id="userAvatar" class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white">AD</div>
-            <h1 id="welcomeUser" class="text-[10px] font-black uppercase">Admin</h1>
+            <div id="userAvatar" class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white uppercase">AD</div>
+            <h1 id="welcomeUser" class="text-[10px] font-black uppercase tracking-widest">Admin</h1>
         </div>
         <div class="flex gap-2">
-            <button onclick="openStudio()" class="bg-blue-600 px-4 py-2 rounded-full text-[9px] font-black uppercase text-white">Studio</button>
-            <button onclick="toggleSettings()" class="text-slate-500 p-2"><i class="fas fa-cog"></i></button>
+            <button onclick="openStudio()" class="bg-blue-600 px-4 py-2 rounded-full text-[9px] font-black uppercase text-white shadow-lg shadow-blue-900/20">Studio</button>
+            <button onclick="toggleSettings()" class="text-slate-500 p-2"><i class="fas fa-cog text-lg"></i></button>
         </div>
     </nav>
 
@@ -45,49 +45,57 @@
             <input type="text" id="studioLinkInput" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-[10px] text-blue-400 outline-none">
         </div>
         <div class="space-y-2">
-            <label class="text-[9px] font-black text-slate-500 uppercase">Link API Giọng đọc ngoài (Tùy chọn)</label>
-            <input type="text" id="externalVoiceApi" placeholder="https://api.example.com/tts?text=" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-[10px] text-white outline-none">
+            <label class="text-[9px] font-black text-slate-500 uppercase">Link API Giọng đọc ngoài</label>
+            <input type="text" id="externalVoiceApi" placeholder="https://..." class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-[10px] text-white outline-none">
         </div>
         <button onclick="saveSettings()" class="w-full py-3 bg-blue-600 rounded-xl font-black text-[10px] uppercase">Lưu cấu hình</button>
     </div>
 
     <div class="max-w-xl mx-auto p-4 space-y-6">
         <div class="flex gap-2">
-            <button onclick="exportFullData()" class="flex-1 bg-green-700/30 border border-green-600/50 p-3 rounded-2xl text-[9px] font-black text-green-400 uppercase"><i class="fas fa-download mr-1"></i> Xuất File Offline</button>
-            <button onclick="document.getElementById('importFile').click()" class="flex-1 bg-blue-700/30 border border-blue-600/50 p-3 rounded-2xl text-[9px] font-black text-blue-400 uppercase"><i class="fas fa-upload mr-1"></i> Nhập File Offline</button>
+            <button onclick="exportFullData()" class="flex-1 bg-green-700/30 border border-green-600/50 p-3 rounded-2xl text-[9px] font-black text-green-400 uppercase"><i class="fas fa-download mr-1"></i> Xuất File</button>
+            <button onclick="document.getElementById('importFile').click()" class="flex-1 bg-blue-700/30 border border-blue-600/50 p-3 rounded-2xl text-[9px] font-black text-blue-400 uppercase"><i class="fas fa-upload mr-1"></i> Nhập File</button>
             <input type="file" id="importFile" class="hidden" accept=".json" onchange="importFullData(event)">
         </div>
 
         <div class="glass p-5 rounded-[2rem] space-y-3">
             <div class="flex justify-between items-center">
-                <span class="text-[10px] font-black uppercase text-slate-500 italic">Danh mục sản phẩm</span>
-                <button onclick="addCategory()" class="text-blue-500"><i class="fas fa-plus-circle"></i></button>
+                <span class="text-[10px] font-black uppercase text-slate-500 italic">Danh mục</span>
+                <button onclick="addCategory()" class="text-blue-500"><i class="fas fa-plus-circle text-lg"></i></button>
             </div>
             <div id="categoryTabs" class="flex flex-wrap gap-2"></div>
         </div>
 
         <div class="glass p-5 rounded-[2rem] space-y-4">
             <div class="grid grid-cols-2 gap-3">
-                <input type="text" id="newPName" placeholder="Tên sản phẩm..." class="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-xs outline-none text-white">
-                <select id="newPCat" class="bg-slate-950 border border-slate-800 px-4 rounded-2xl text-[10px] text-white outline-none font-bold uppercase"></select>
+                <input type="text" id="newPName" placeholder="Tên sản phẩm..." class="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-xs outline-none text-white font-bold">
+                <select id="newPCat" class="bg-slate-950 border border-slate-800 px-4 rounded-2xl text-[10px] text-white outline-none font-black uppercase"></select>
             </div>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="document.getElementById('imgUpload').click()" class="bg-slate-800 border border-dashed border-slate-600 rounded-2xl p-3 text-[10px] font-bold text-slate-400 uppercase">
-                    <span id="imgStatus">Tải ảnh</span>
-                </button>
-                <input type="file" id="imgUpload" accept="image/*" class="hidden" onchange="previewImg(this)">
-                <button onclick="processImport()" class="bg-blue-600 rounded-2xl font-black text-[10px] uppercase text-white">Lưu kho</button>
+            
+            <div class="flex items-center gap-3">
+                <div id="newPImgPreview" class="hidden relative group">
+                    <img id="tempImgTag" src="" class="w-16 h-16 rounded-xl object-cover border-2 border-blue-500">
+                    <button onclick="removeTempImg()" class="absolute -top-2 -right-2 bg-red-600 text-white w-5 h-5 rounded-full text-[10px]"><i class="fas fa-times"></i></button>
+                </div>
+
+                <div class="flex-1 grid grid-cols-2 gap-3">
+                    <button onclick="document.getElementById('imgUpload').click()" id="btnUpload" class="bg-slate-800 border border-dashed border-slate-600 rounded-2xl p-3 text-[10px] font-bold text-slate-400 uppercase hover:bg-slate-700 transition">
+                        <i class="fas fa-image mr-1"></i> Tải ảnh
+                    </button>
+                    <input type="file" id="imgUpload" accept="image/*" class="hidden" onchange="previewImg(this, 'temp')">
+                    
+                    <button onclick="processImport()" class="bg-red-600 rounded-2xl font-black text-[10px] uppercase text-white shadow-lg shadow-red-900/30">Lưu sản phẩm</button>
+                </div>
             </div>
-            <textarea id="newPJson" placeholder="Dán JSON kịch bản..." class="w-full h-24 bg-slate-950 border border-slate-800 p-4 rounded-2xl text-[10px] outline-none text-white"></textarea>
+            <textarea id="newPJson" placeholder="Dán JSON kịch bản..." class="w-full h-24 bg-slate-950 border border-slate-800 p-4 rounded-2xl text-[10px] outline-none text-white focus:border-red-500 transition"></textarea>
         </div>
 
-        <div class="glass p-6 rounded-[2rem] space-y-5">
+        <div class="glass p-6 rounded-[2rem] space-y-5 border border-slate-800/50">
             <div class="grid grid-cols-2 gap-2">
                 <button id="modeOnline" onclick="setMode('online')" class="bg-slate-800 p-3 rounded-2xl text-[10px] font-bold uppercase">Giọng Online</button>
                 <button id="modeOffline" onclick="setMode('offline')" class="bg-red-600 p-3 rounded-2xl text-[10px] font-bold uppercase text-white">Giọng Offline</button>
             </div>
-
-            <div class="space-y-4 bg-slate-950/50 p-4 rounded-2xl border border-slate-800/50">
+            <div class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1">
                         <div class="flex justify-between text-[9px] font-black text-slate-500 uppercase"><span>Tốc độ</span><span id="rateVal">1.0</span></div>
@@ -98,32 +106,42 @@
                         <input type="range" id="voiceVol" min="0" max="1" step="0.1" value="1.0" oninput="updateUI()">
                     </div>
                 </div>
-                <div id="voiceConfig" class="pt-2">
-                    <label class="text-[8px] font-bold text-slate-600 uppercase mb-1 block">Chọn giọng đọc hệ thống (Việt/Anh)</label>
-                    <select id="voiceSelect" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-2xl text-[10px] text-white outline-none"></select>
-                </div>
+                <select id="voiceSelect" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-2xl text-[10px] text-white outline-none"></select>
             </div>
         </div>
 
-        <div class="glass p-6 rounded-[2.5rem] text-center">
+        <div class="glass p-6 rounded-[2.5rem] text-center shadow-2xl">
             <div class="flex justify-between items-center mb-6 px-4">
-                <span class="text-[10px] font-black text-slate-500 uppercase">Nghỉ giữa câu (s)</span>
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Nghỉ giữa câu (giây)</span>
                 <input type="number" id="interval" value="5" class="bg-transparent text-right font-black text-red-500 text-4xl outline-none w-16">
             </div>
-            <button id="btnStart" onclick="toggleLive()" class="w-full py-6 bg-red-600 rounded-[2rem] font-black text-lg shadow-xl uppercase text-white">TREO LIVE</button>
+            <button id="btnStart" onclick="toggleLive()" class="w-full py-6 bg-red-600 rounded-[2rem] font-black text-lg shadow-xl uppercase text-white tracking-widest transition-all active:scale-95">TREO LIVE</button>
         </div>
 
         <div id="productList" class="space-y-3 pb-20"></div>
     </div>
 
-    <div id="editModal" class="fixed inset-0 z-[110] bg-black/95 hidden p-6">
-        <div class="max-w-xl mx-auto glass p-6 rounded-[2rem] space-y-4 h-full flex flex-col">
+    <div id="editModal" class="fixed inset-0 z-[110] bg-black/95 hidden p-6 overflow-y-auto">
+        <div class="max-w-xl mx-auto glass p-6 rounded-[2rem] space-y-4 min-h-[80vh] flex flex-col shadow-2xl border border-red-500/20">
             <div class="flex justify-between items-center border-b border-slate-800 pb-4">
-                <h3 id="editTitle" class="font-black text-sm uppercase text-red-500">SỬA KỊCH BẢN</h3>
-                <button onclick="closeEdit()" class="text-white text-xl">×</button>
+                <div class="flex items-center gap-3">
+                    <div class="relative">
+                        <img id="editImgPreview" src="" class="w-12 h-12 rounded-xl object-cover border border-slate-700">
+                        <button onclick="document.getElementById('editImgUpload').click()" class="absolute -bottom-1 -right-1 bg-blue-600 w-5 h-5 rounded-full text-[8px] flex items-center justify-center"><i class="fas fa-camera"></i></button>
+                        <input type="file" id="editImgUpload" class="hidden" accept="image/*" onchange="previewImg(this, 'edit')">
+                    </div>
+                    <div>
+                        <h3 id="editTitle" class="font-black text-sm uppercase text-red-500 leading-none"></h3>
+                        <p class="text-[8px] text-slate-500 mt-1 uppercase">Chỉnh sửa nội dung & ảnh</p>
+                    </div>
+                </div>
+                <button onclick="closeEdit()" class="text-white text-xl p-2">×</button>
             </div>
-            <div id="scriptItems" class="flex-1 overflow-y-auto space-y-3"></div>
-            <button onclick="saveEdit()" class="w-full py-4 bg-green-600 rounded-2xl font-black uppercase">HOÀN TẤT</button>
+            <div id="scriptItems" class="flex-1 overflow-y-auto space-y-3 py-2 pr-2"></div>
+            <div class="flex gap-2">
+                <button onclick="closeEdit()" class="flex-1 py-4 bg-slate-800 rounded-2xl font-black uppercase text-[10px]">Hủy</button>
+                <button onclick="saveEdit()" class="flex-[2] py-4 bg-red-600 rounded-2xl font-black uppercase text-[10px] shadow-lg shadow-red-900/40">Lưu thay đổi</button>
+            </div>
         </div>
     </div>
 
@@ -146,28 +164,20 @@
             document.getElementById('loginScreen').classList.add('hidden');
             const saved = localStorage.getItem('ngao_v22_final_' + user);
             if (saved) store = JSON.parse(saved);
-            
             document.getElementById('studioLinkInput').value = store.studioLink || "";
             document.getElementById('externalVoiceApi').value = store.extVoice || "";
-            
-            sync();
-            loadVoices();
+            sync(); loadVoices();
         }
 
-        // --- STUDIO & SETTINGS ---
         function toggleSettings() { document.getElementById('settingsPanel').classList.toggle('hidden'); }
         function saveSettings() {
             store.studioLink = document.getElementById('studioLinkInput').value;
             store.extVoice = document.getElementById('externalVoiceApi').value;
-            sync();
-            alert("Đã lưu cài đặt!");
-            toggleSettings();
+            sync(); alert("Đã lưu!"); toggleSettings();
         }
-        function openStudio() { window.open(store.studioLink, 'Studio', 'width=900,height=700'); }
+        function openStudio() { window.open(store.studioLink, 'Studio', 'width=1000,height=800'); }
 
-        // --- VOICES ---
         function loadVoices() {
-            // Lấy tất cả giọng Việt (vi) và Anh (en)
             voices = window.speechSynthesis.getVoices().filter(v => v.lang.includes('vi') || v.lang.includes('en'));
             document.getElementById('voiceSelect').innerHTML = voices.map((v, i) => `
                 <option value="${i}">${v.lang.startsWith('vi') ? '🇻🇳' : '🇺🇸'} ${v.name}</option>
@@ -175,124 +185,134 @@
         }
         window.speechSynthesis.onvoiceschanged = loadVoices;
 
-        // --- OFFLINE SYNC ---
-        function exportFullData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(store));
-            const dl = document.createElement('a');
-            dl.setAttribute("href", dataStr);
-            dl.setAttribute("download", `ngao_iu_${currentUser}.json`);
-            dl.click();
+        function previewImg(input, mode) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    if(mode === 'temp') {
+                        tempImg = e.target.result;
+                        document.getElementById('tempImgTag').src = tempImg;
+                        document.getElementById('newPImgPreview').classList.remove('hidden');
+                        document.getElementById('btnUpload').classList.add('hidden');
+                    } else if (mode === 'edit') {
+                        document.getElementById('editImgPreview').src = e.target.result;
+                        // Ảnh edit sẽ được lưu khi bấm nút Save Edit
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
-        function importFullData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    store = JSON.parse(e.target.result);
-                    sync();
-                    alert("Đã nhập dữ liệu!");
-                } catch (err) { alert("Lỗi file!"); }
-            };
-            reader.readAsText(file);
+        function removeTempImg() {
+            tempImg = "";
+            document.getElementById('newPImgPreview').classList.add('hidden');
+            document.getElementById('btnUpload').classList.remove('hidden');
         }
 
-        // --- CATEGORIES ---
-        function renderCategories() {
-            let html = `<div onclick="filterBy('All')" class="cat-tag ${currentFilter === 'All' ? 'active' : ''}">Tất cả</div>`;
-            store.categories.forEach(cat => {
-                html += `<div onclick="filterBy('${cat}')" class="cat-tag ${currentFilter === cat ? 'active' : ''}">${cat}</div>`;
-            });
-            document.getElementById('categoryTabs').innerHTML = html;
-            document.getElementById('newPCat').innerHTML = store.categories.map(c => `<option value="${c}">${c}</option>`).join('');
-        }
-
-        function addCategory() {
-            const n = prompt("Tên danh mục:");
-            if(n) { store.categories.push(n); sync(); }
-        }
-
-        function filterBy(cat) { currentFilter = cat; renderCategories(); renderList(); }
-
-        // --- PRODUCTS ---
         function processImport() {
             const name = document.getElementById('newPName').value;
             const cat = document.getElementById('newPCat').value;
             let raw = document.getElementById('newPJson').value.trim();
-            if(!name || !raw) return;
+            if(!name || !raw) return alert("Thiếu tên hoặc kịch bản!");
             try {
-                if(!raw.startsWith('[')) raw = '[' + raw + ']';
-                const scripts = JSON.parse(raw).map(i => i.script || i.content || (typeof i === 'string' ? i : "")).filter(s => s);
-                store.products.push({ id: Date.now(), name, category: cat, img: tempImg || "https://placehold.co/50x50", active: true, scripts });
+                // Tự sửa lỗi JSON cơ bản
+                if(!raw.startsWith('[')) raw = '[' + raw;
+                if(!raw.endsWith(']')) raw = raw + ']';
+                
+                const data = JSON.parse(raw);
+                const scripts = data.map(i => i.script || i.content || i.text || (typeof i === 'string' ? i : "")).filter(s => s);
+                
+                store.products.push({ 
+                    id: Date.now(), 
+                    name, 
+                    category: cat, 
+                    img: tempImg || "https://placehold.co/100x100?text=No+Img", 
+                    active: true, 
+                    scripts 
+                });
+                
                 sync();
-                document.getElementById('newPName').value = ""; document.getElementById('newPJson').value = "";
-            } catch(e) { alert("Lỗi JSON!"); }
+                document.getElementById('newPName').value = ""; 
+                document.getElementById('newPJson').value = "";
+                removeTempImg();
+                alert("Đã thêm thành công!");
+            } catch(e) { alert("Lỗi kịch bản! Hãy kiểm tra lại định dạng JSON."); }
         }
 
         function renderList() {
             const list = store.products.filter(p => currentFilter === "All" || p.category === currentFilter);
-            document.getElementById('productList').innerHTML = list.map((p, i) => {
+            document.getElementById('productList').innerHTML = list.map((p) => {
                 const gIdx = store.products.findIndex(x => x.id === p.id);
                 return `
                 <div class="product-card p-4 flex items-center justify-between glass ${p.active ? 'active' : ''}">
-                    <div class="flex items-center gap-3 flex-1" onclick="openEdit(${gIdx})">
-                        <img src="${p.img}" class="thumb">
+                    <div class="flex items-center gap-4 flex-1" onclick="openEdit(${gIdx})">
+                        <img src="${p.img}" class="thumb shadow-lg border border-slate-700">
                         <div class="text-left">
-                            <span class="text-[7px] text-slate-500 uppercase font-bold">${p.category}</span>
-                            <div class="font-black text-[11px] uppercase ${p.active ? 'text-red-500' : 'text-slate-500'}">${p.name}</div>
+                            <span class="text-[7px] text-slate-500 uppercase font-black tracking-tighter">${p.category}</span>
+                            <div class="font-black text-[11px] uppercase tracking-wide ${p.active ? 'text-red-500' : 'text-slate-500'}">${p.name}</div>
+                            <div class="text-[8px] text-slate-600 mt-1"><i class="fas fa-comment-dots mr-1"></i>${p.scripts.length} câu thoại</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-4">
-                        <input type="checkbox" ${p.active ? 'checked' : ''} onchange="toggleActive(${gIdx})" class="w-6 h-6 accent-red-600">
-                        <button onclick="deleteProduct(${gIdx})" class="text-slate-800"><i class="fas fa-trash"></i></button>
+                        <input type="checkbox" ${p.active ? 'checked' : ''} onchange="toggleActive(${gIdx})" class="w-6 h-6 accent-red-600 cursor-pointer">
+                        <button onclick="deleteProduct(${gIdx})" class="text-slate-700 hover:text-red-500 transition"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        // --- CORE ---
+        function openEdit(idx) {
+            editIdx = idx;
+            const p = store.products[idx];
+            document.getElementById('editTitle').innerText = p.name;
+            document.getElementById('editImgPreview').src = p.img;
+            document.getElementById('scriptItems').innerHTML = p.scripts.map((s) => `
+                <div class="relative group">
+                    <textarea class="w-full bg-slate-900 border border-slate-800 p-4 rounded-2xl text-[11px] text-white h-24 outline-none focus:border-blue-500 transition">${s}</textarea>
+                    <button onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-slate-700 hover:text-red-500"><i class="fas fa-times"></i></button>
+                </div>
+            `).join('');
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function saveEdit() {
+            const p = store.products[editIdx];
+            p.img = document.getElementById('editImgPreview').src; // Lưu ảnh mới (nếu có thay đổi)
+            p.scripts = Array.from(document.querySelectorAll('#scriptItems textarea')).map(t => t.value);
+            sync(); closeEdit();
+        }
+
         function sync() {
             localStorage.setItem('ngao_v22_final_' + currentUser, JSON.stringify(store));
             renderCategories(); renderList();
         }
+
         function toggleActive(i) { store.products[i].active = !store.products[i].active; sync(); }
-        function deleteProduct(i) { if(confirm('Xóa?')) { store.products.splice(i, 1); sync(); } }
+        function deleteProduct(i) { if(confirm('Xóa sản phẩm này?')) { store.products.splice(i, 1); sync(); } }
+        function closeEdit() { document.getElementById('editModal').classList.add('hidden'); }
+        function setMode(m) { currentMode = m; sync(); }
         function updateUI() {
             document.getElementById('rateVal').innerText = document.getElementById('voiceRate').value;
             document.getElementById('voiceVolVal').innerText = Math.round(document.getElementById('voiceVol').value * 100) + "%";
-        }
-        function setMode(m) { 
-            currentMode = m; 
-            document.getElementById('modeOnline').className = m === 'online' ? 'bg-red-600 p-3 rounded-2xl text-[10px] font-bold uppercase text-white' : 'bg-slate-800 p-3 rounded-2xl text-[10px] font-bold uppercase';
-            document.getElementById('modeOffline').className = m === 'offline' ? 'bg-red-600 p-3 rounded-2xl text-[10px] font-bold uppercase text-white' : 'bg-slate-800 p-3 rounded-2xl text-[10px] font-bold uppercase';
         }
 
         function speak(text, callback) {
             const clean = text.replace(/giá/gi, "cành").replace(/000/g, " ngàn");
             const rate = document.getElementById('voiceRate').value;
             const vol = document.getElementById('voiceVol').value;
-
-            // Nếu có API ngoài thì ưu tiên dùng (Nếu muốn)
             if (store.extVoice && currentMode === 'online') {
                 ttsCloud.src = store.extVoice + encodeURIComponent(clean);
-                ttsCloud.volume = vol;
-                ttsCloud.play().catch(callback);
-                ttsCloud.onended = callback;
+                ttsCloud.volume = vol; ttsCloud.play().catch(callback); ttsCloud.onended = callback;
                 return;
             }
-
             if (currentMode === 'online') {
                 ttsCloud.src = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(clean)}&tl=vi&client=tw-ob&ttsspeed=${rate}`;
-                ttsCloud.volume = vol;
-                ttsCloud.play().catch(callback);
-                ttsCloud.onended = callback;
+                ttsCloud.volume = vol; ttsCloud.play().catch(callback); ttsCloud.onended = callback;
             } else {
                 window.speechSynthesis.cancel();
                 const msg = new SpeechSynthesisUtterance(clean);
                 msg.voice = voices[document.getElementById('voiceSelect').value];
-                msg.rate = rate; msg.volume = vol;
-                msg.onend = callback;
+                msg.rate = rate; msg.volume = vol; msg.onend = callback;
                 window.speechSynthesis.speak(msg);
             }
         }
@@ -301,7 +321,7 @@
             isLive = !isLive;
             const btn = document.getElementById('btnStart');
             if(isLive) {
-                btn.innerText = 'DỪNG'; btn.classList.replace('bg-red-600', 'bg-slate-800');
+                btn.innerText = 'DỪNG TREO'; btn.classList.replace('bg-red-600', 'bg-slate-800');
                 worker.postMessage({ action: 'start', interval: document.getElementById('interval').value });
                 runNext();
             } else {
@@ -323,28 +343,32 @@
             }
         }
 
-        function previewImg(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => { tempImg = e.target.result; document.getElementById('imgStatus').innerText = "OK"; };
-                reader.readAsDataURL(input.files[0]);
-            }
+        function renderCategories() {
+            let html = `<div onclick="filterBy('All')" class="cat-tag ${currentFilter === 'All' ? 'active' : ''}">Tất cả</div>`;
+            store.categories.forEach(cat => {
+                html += `<div onclick="filterBy('${cat}')" class="cat-tag ${currentFilter === cat ? 'active' : ''}">${cat}</div>`;
+            });
+            document.getElementById('categoryTabs').innerHTML = html;
+            document.getElementById('newPCat').innerHTML = store.categories.map(c => `<option value="${c}">${c}</option>`).join('');
         }
-
-        function openEdit(idx) {
-            editIdx = idx;
-            const p = store.products[idx];
-            document.getElementById('editTitle').innerText = p.name;
-            document.getElementById('scriptItems').innerHTML = p.scripts.map((s, i) => `
-                <textarea class="w-full bg-slate-900 border border-slate-800 p-3 rounded-xl text-[10px] text-white h-20 outline-none">${s}</textarea>
-            `).join('');
-            document.getElementById('editModal').classList.remove('hidden');
+        function filterBy(cat) { currentFilter = cat; renderCategories(); renderList(); }
+        function addCategory() { const n = prompt("Tên danh mục:"); if(n) { store.categories.push(n); sync(); } }
+        function exportFullData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(store));
+            const dl = document.createElement('a');
+            dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", `ngao_iu_${currentUser}.json`);
+            dl.click();
         }
-        function saveEdit() {
-            store.products[editIdx].scripts = Array.from(document.querySelectorAll('#scriptItems textarea')).map(t => t.value);
-            sync(); closeEdit();
+        function importFullData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try { store = JSON.parse(e.target.result); sync(); alert("Đã nhập!"); } catch (err) { alert("Lỗi file!"); }
+            };
+            reader.readAsText(file);
         }
-        function closeEdit() { document.getElementById('editModal').classList.add('hidden'); }
     </script>
 </body>
 </html>
