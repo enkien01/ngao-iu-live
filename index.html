@@ -3,66 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ngao IU - v22 Ultimate Cloud</title>
+    <title>Ngao IU - v22 Offline Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-
     <style>
         body { background: #020617; color: #f8fafc; font-family: sans-serif; }
         .glass { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
-        .product-card { transition: 0.3s; border: 1px solid #1e293b; background: rgba(30, 41, 59, 0.4); border-radius: 1.5rem; cursor: pointer; }
+        .product-card { transition: 0.3s; border: 1px solid #1e293b; background: rgba(30, 41, 59, 0.4); border-radius: 1.5rem; }
         .product-card.active { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
         .thumb { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; }
-        .mode-btn.active { background: #3b82f6; color: white; }
+        .cat-tag { padding: 4px 12px; border-radius: 20px; font-size: 9px; font-weight: 800; text-transform: uppercase; cursor: pointer; border: 1px solid #334155; }
+        .cat-tag.active { background: #ef4444; border-color: #ef4444; color: white; }
         input[type="range"] { accent-color: #ef4444; cursor: pointer; }
-        /* Tối ưu cho mobile */
-        textarea, input { font-size: 16px !important; } 
     </style>
 </head>
 <body class="pb-32">
 
     <div id="loginScreen" class="fixed inset-0 z-[100] bg-slate-950 flex items-center justify-center p-6 text-center">
-        <div class="w-full max-w-sm glass p-8 rounded-[2.5rem] space-y-6">
+        <div class="w-full max-w-sm glass p-8 rounded-[2.5rem] space-y-6 border-2 border-red-600/20">
             <div class="w-16 h-16 bg-red-600 rounded-2xl mx-auto flex items-center justify-center text-3xl font-black italic text-white">N</div>
-            <h2 class="text-xl font-black uppercase">Ngao IU v22</h2>
-            <p class="text-[10px] text-slate-500 uppercase font-bold">Dữ liệu sẽ đồng bộ theo tên tài khoản</p>
-            <input type="text" id="user" placeholder="Tên tài khoản..." class="w-full bg-slate-900 border border-slate-800 p-4 rounded-2xl outline-none text-white">
-            <button id="btnLogin" onclick="handleLogin()" class="w-full py-4 bg-red-600 rounded-2xl font-black uppercase text-white shadow-lg">Vào hệ thống</button>
+            <h2 class="text-xl font-black uppercase italic">Ngao IU v22 Offline</h2>
+            <input type="text" id="user" placeholder="Tên tài khoản..." class="w-full bg-slate-900 border border-slate-800 p-4 rounded-2xl outline-none text-white text-center">
+            <button onclick="handleLogin()" class="w-full py-4 bg-red-600 rounded-2xl font-black uppercase text-white shadow-lg">Vào hệ thống</button>
         </div>
     </div>
 
     <nav class="p-4 glass sticky top-0 z-50 flex justify-between items-center border-b border-slate-800">
         <div class="flex items-center gap-3">
             <div id="userAvatar" class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white">AD</div>
-            <h1 id="welcomeUser" class="text-[10px] font-black uppercase italic">Admin</h1>
+            <h1 id="welcomeUser" class="text-[10px] font-black uppercase">Admin</h1>
         </div>
-        <div class="flex gap-2">
-            <button onclick="openStudio()" class="bg-blue-600 px-4 py-2 rounded-full text-[9px] font-black uppercase text-white">Studio</button>
-            <button onclick="toggleSettings()" class="text-slate-500 p-2"><i class="fas fa-cog"></i></button>
+        <div class="flex gap-1">
+            <button onclick="exportFullData()" class="bg-green-600 px-3 py-2 rounded-xl text-[9px] font-black text-white"><i class="fas fa-download mr-1"></i> XUẤT FILE</button>
+            <button onclick="document.getElementById('importFile').click()" class="bg-blue-600 px-3 py-2 rounded-xl text-[9px] font-black text-white"><i class="fas fa-upload mr-1"></i> NHẬP FILE</button>
+            <input type="file" id="importFile" class="hidden" accept=".json" onchange="importFullData(event)">
         </div>
     </nav>
 
     <div class="max-w-xl mx-auto p-4 space-y-6">
-        <div class="glass p-5 rounded-[2rem] space-y-4">
+
+        <div class="glass p-5 rounded-[2rem] space-y-3">
+            <div class="flex justify-between items-center">
+                <span class="text-[10px] font-black uppercase text-slate-500">Danh mục sản phẩm</span>
+                <button onclick="addCategory()" class="text-blue-500 text-[18px]"><i class="fas fa-plus-circle"></i></button>
+            </div>
+            <div id="categoryTabs" class="flex flex-wrap gap-2">
+                </div>
+        </div>
+
+        <div class="glass p-5 rounded-[2rem] space-y-4 border border-blue-600/20">
             <div class="grid grid-cols-2 gap-3">
                 <input type="text" id="newPName" placeholder="Tên sản phẩm..." class="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-xs outline-none text-white">
-                <button onclick="document.getElementById('imgUpload').click()" class="bg-slate-800 border border-dashed border-slate-600 rounded-2xl text-[10px] font-bold">
-                    <span id="imgStatus" class="text-slate-400 uppercase">Tải ảnh</span>
+                <select id="newPCat" class="bg-slate-950 border border-slate-800 px-4 rounded-2xl text-[10px] text-white outline-none uppercase font-bold">
+                    <option value="Chưa phân loại">Danh mục...</option>
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="document.getElementById('imgUpload').click()" class="flex-1 bg-slate-800 border border-dashed border-slate-600 rounded-2xl p-3 text-[10px] font-bold">
+                    <span id="imgStatus" class="text-slate-400 uppercase">Tải ảnh mẫu</span>
                 </button>
                 <input type="file" id="imgUpload" accept="image/*" class="hidden" onchange="previewImg(this)">
             </div>
-            <textarea id="newPJson" placeholder="Dán JSON kịch bản..." class="w-full h-24 bg-slate-950 border border-slate-800 p-4 rounded-2xl text-[10px] outline-none text-white"></textarea>
-            <button onclick="processImport()" class="w-full py-4 bg-blue-600 rounded-2xl font-black text-[11px] uppercase text-white">Lưu vào kho hàng</button>
+            <textarea id="newPJson" placeholder="Dán nội dung JSON kịch bản..." class="w-full h-24 bg-slate-950 border border-slate-800 p-4 rounded-2xl text-[10px] outline-none text-white"></textarea>
+            <button onclick="processImport()" class="w-full py-4 bg-blue-600 rounded-2xl font-black text-[11px] uppercase text-white shadow-blue-900/20 shadow-lg">Lưu vào kho hàng</button>
         </div>
 
         <div class="glass p-6 rounded-[2rem] space-y-5">
             <div class="grid grid-cols-2 gap-2">
-                <button id="modeOnline" onclick="setMode('online')" class="mode-btn active p-3 rounded-2xl text-[10px] font-bold uppercase">Giọng Online</button>
-                <button id="modeOffline" onclick="setMode('offline')" class="mode-btn p-3 rounded-2xl text-[10px] font-bold uppercase">Giọng Offline</button>
+                <button id="modeOnline" onclick="setMode('online')" class="bg-slate-800 p-3 rounded-2xl text-[10px] font-bold uppercase">Giọng Online</button>
+                <button id="modeOffline" onclick="setMode('offline')" class="bg-red-600 p-3 rounded-2xl text-[10px] font-bold uppercase text-white">Giọng Offline</button>
             </div>
+
             <div class="space-y-4 bg-slate-950/50 p-4 rounded-2xl border border-slate-800/50">
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1">
@@ -70,29 +81,13 @@
                         <input type="range" id="voiceRate" min="0.5" max="2" step="0.1" value="1.0" oninput="updateUI()">
                     </div>
                     <div class="space-y-1">
-                        <div class="flex justify-between text-[9px] font-black text-slate-500 uppercase"><span>Cảm xúc</span><span id="pitchVal">1.0</span></div>
-                        <input type="range" id="voicePitch" min="0.5" max="2" step="0.1" value="1.0" oninput="updateUI()">
+                        <div class="flex justify-between text-[9px] font-black text-slate-500 uppercase"><span>Âm lượng</span><span id="voiceVolVal">100%</span></div>
+                        <input type="range" id="voiceVol" min="0" max="1" step="0.1" value="1.0" oninput="updateUI()">
                     </div>
                 </div>
-                <div class="space-y-1">
-                    <div class="flex justify-between text-[9px] font-black text-slate-400 uppercase"><span>Âm lượng giọng</span><span id="voiceVolVal">100%</span></div>
-                    <input type="range" id="voiceVol" min="0" max="1" step="0.1" value="1.0" oninput="updateUI()" class="w-full">
+                <div id="offlineConfig" class="pt-2">
+                    <select id="voiceSelect" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-2xl text-xs text-white outline-none"></select>
                 </div>
-            </div>
-            <div id="offlineConfig" class="hidden"><select id="voiceSelect" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-2xl text-xs text-white outline-none"></select></div>
-            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-4">
-                <div class="flex items-center justify-between">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="useMusic" class="w-4 h-4 accent-red-600">
-                        <span class="text-[10px] font-black uppercase text-slate-400">Nhạc nền</span>
-                    </label>
-                    <button onclick="document.getElementById('bgMusicInput').click()" class="text-[8px] bg-slate-800 px-3 py-1.5 rounded-lg text-white">CHỌN FILE</button>
-                </div>
-                <div class="space-y-1">
-                    <div class="flex justify-between text-[9px] font-black text-slate-500 uppercase"><span>Âm lượng nhạc</span><span id="volVal">20%</span></div>
-                    <input type="range" id="musicVol" min="0" max="1" step="0.05" value="0.2" oninput="updateMusicVol()">
-                </div>
-                <input type="file" id="bgMusicInput" accept="audio/*" class="hidden" onchange="loadMusic(event)">
             </div>
         </div>
 
@@ -110,105 +105,170 @@
     <div id="editModal" class="fixed inset-0 z-[110] bg-black/95 hidden p-6">
         <div class="max-w-xl mx-auto glass p-6 rounded-[2rem] space-y-4 h-full flex flex-col">
             <div class="flex justify-between items-center border-b border-slate-800 pb-4">
-                <h3 id="editTitle" class="font-black text-sm uppercase text-red-500">CHỈNH SỬA</h3>
-                <button onclick="closeEdit()" class="text-slate-500 text-xl p-2"><i class="fas fa-times"></i></button>
+                <h3 id="editTitle" class="font-black text-sm uppercase text-red-500">SỬA KỊCH BẢN</h3>
+                <button onclick="closeEdit()" class="text-white text-xl p-2">×</button>
             </div>
-            <div id="scriptItems" class="flex-1 overflow-y-auto space-y-3 pr-2 py-2"></div>
-            <button onclick="saveEdit()" class="w-full py-4 bg-green-600 rounded-2xl font-black uppercase text-white">LƯU THAY ĐỔI</button>
+            <div id="scriptItems" class="flex-1 overflow-y-auto space-y-3 py-2"></div>
+            <button onclick="saveEdit()" class="w-full py-4 bg-green-600 rounded-2xl font-black uppercase">LƯU THAY ĐỔI</button>
         </div>
     </div>
 
     <audio id="ttsCloud" crossOrigin="anonymous"></audio>
-    <audio id="bgMusic" loop crossOrigin="anonymous"></audio>
 
     <script>
-        // --- CẤU HÌNH FIREBASE TỪ ẢNH CỦA BẠN ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyBJ6CBUOkK78XHF0mTJ-SMjCKfhxjzEfY4",
-            authDomain: "ngao-iu-live.firebaseapp.com",
-            projectId: "ngao-iu-live",
-            storageBucket: "ngao-iu-live.firebasestorage.app",
-            messagingSenderId: "395104205957",
-            appId: "1:395104205957:web:3b781846a843d175a6fdec",
-            databaseURL: "https://ngao-iu-live-default-rtdb.firebaseio.com"
-        };
-        
-        firebase.initializeApp(firebaseConfig);
-        const rdb = firebase.database();
-
-        let db = [], currentUser = "", currentMode = 'online', tempImg = "", editIdx = null;
-        let isLive = false, voices = [];
-        let miniLink = "https://ai.studio/apps/ce2d7b0e-45a7-499f-9b6d-8e33db158288";
+        // Cấu trúc DB mới: { categories: [], products: [] }
+        let store = { categories: ["Thời trang", "Gia dụng"], products: [] };
+        let currentUser = "", currentMode = 'offline', tempImg = "", editIdx = null;
+        let isLive = false, voices = [], currentFilter = "All";
 
         const ttsCloud = document.getElementById('ttsCloud');
-        const bgMusic = document.getElementById('bgMusic');
 
-        // Worker chạy ngầm
+        // Worker ổn định cho Mobile
         const workerBlob = new Blob([`let t=null;self.onmessage=function(e){if(e.data.action==='start'){clearInterval(t);t=setInterval(()=>{self.postMessage('tick')},e.data.interval*1000)}else if(e.data.action==='stop'){clearInterval(t)}}`], {type:'text/javascript'});
         const worker = new Worker(URL.createObjectURL(workerBlob));
         worker.onmessage = (e) => { if(isLive && e.data === 'tick') runNext(); };
 
-        // --- HÀM ĐĂNG NHẬP VỚI ĐỒNG BỘ CLOUD ---
         function handleLogin() {
             const user = document.getElementById('user').value.trim();
             if (!user) return;
-            
-            const btn = document.getElementById('btnLogin');
-            btn.innerText = "ĐANG TẢI...";
-            btn.disabled = true;
-
             currentUser = user;
+            document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('welcomeUser').innerText = user;
-
-            // Tải dữ liệu từ mây về
-            rdb.ref('users/' + currentUser).once('value', (snapshot) => {
-                const data = snapshot.val();
-                if(data) {
-                    db = data;
-                } else {
-                    // Nếu mây trống thì lấy từ máy hiện tại
-                    db = JSON.parse(localStorage.getItem('db_v22_' + user)) || [];
-                }
-                
-                document.getElementById('loginScreen').classList.add('hidden');
-                renderList(); 
-                loadVoices();
-            }).catch(err => {
-                alert("Lỗi kết nối Firebase: " + err.message);
-                btn.innerText = "THỬ LẠI";
-                btn.disabled = false;
-            });
+            
+            const saved = localStorage.getItem('ngao_v22_pro_' + user);
+            if (saved) store = JSON.parse(saved);
+            
+            sync();
+            loadVoices();
         }
 
-        // --- HÀM LƯU DỮ LIỆU ---
-        function sync() {
-            renderList();
-            if(currentUser) {
-                // Đẩy lên mây Firebase
-                rdb.ref('users/' + currentUser).set(db);
-                // Lưu dự phòng ở máy
-                localStorage.setItem('db_v22_' + currentUser, JSON.stringify(db));
+        // --- QUẢN LÝ DANH MỤC ---
+        function renderCategories() {
+            const container = document.getElementById('categoryTabs');
+            const select = document.getElementById('newPCat');
+            
+            let html = `<div onclick="filterBy('All')" class="cat-tag ${currentFilter === 'All' ? 'active' : ''}">Tất cả</div>`;
+            let selectHtml = `<option value="Chưa phân loại">Danh mục...</option>`;
+            
+            store.categories.forEach(cat => {
+                html += `
+                    <div class="relative group">
+                        <div onclick="filterBy('${cat}')" class="cat-tag ${currentFilter === cat ? 'active' : ''}">${cat}</div>
+                        <button onclick="deleteCategory('${cat}')" class="absolute -top-2 -right-1 text-[10px] bg-slate-800 rounded-full w-4 h-4 text-red-500">×</button>
+                    </div>`;
+                selectHtml += `<option value="${cat}">${cat}</option>`;
+            });
+            
+            container.innerHTML = html;
+            select.innerHTML = selectHtml;
+        }
+
+        function addCategory() {
+            const name = prompt("Nhập tên danh mục mới:");
+            if (name && !store.categories.includes(name)) {
+                store.categories.push(name);
+                sync();
             }
         }
 
+        function deleteCategory(cat) {
+            if (confirm(`Xóa danh mục "${cat}"? Các sản phẩm thuộc mục này sẽ về "Chưa phân loại".`)) {
+                store.categories = store.categories.filter(c => c !== cat);
+                store.products.forEach(p => { if(p.category === cat) p.category = "Chưa phân loại"; });
+                sync();
+            }
+        }
+
+        function filterBy(cat) {
+            currentFilter = cat;
+            renderCategories();
+            renderList();
+        }
+
+        // --- XUẤT NHẬP FILE ---
+        function exportFullData() {
+            if (store.products.length === 0) return alert("Không có dữ liệu để tải!");
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(store));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `ngao_iu_v22_${currentUser}.json`);
+            dlAnchorElem.click();
+        }
+
+        function importFullData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (confirm("Hòa trộn vào danh sách hiện tại? (Hủy sẽ thay thế tất cả)")) {
+                        store.categories = [...new Set([...store.categories, ...imported.categories])];
+                        store.products = [...store.products, ...imported.products];
+                    } else {
+                        store = imported;
+                    }
+                    sync();
+                    alert("Đã nhập dữ liệu thành công!");
+                } catch (err) { alert("File không hợp lệ!"); }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- XỬ LÝ SẢN PHẨM ---
+        function processImport() {
+            const name = document.getElementById('newPName').value;
+            const category = document.getElementById('newPCat').value;
+            let raw = document.getElementById('newPJson').value.trim();
+            if(!name || !raw) return alert("Vui lòng điền đủ tên và nội dung!");
+            
+            try {
+                if(!raw.startsWith('[')) raw = '[' + raw + ']';
+                const scripts = JSON.parse(raw).map(i => i.script || i.content || i.mo_ta || (typeof i === 'string' ? i : "")).filter(s => s);
+                store.products.push({ id: Date.now(), name, category, img: tempImg || "https://placehold.co/50x50", active: true, scripts });
+                sync();
+                document.getElementById('newPName').value = ""; document.getElementById('newPJson').value = "";
+                tempImg = ""; document.getElementById('imgStatus').innerText = "Tải ảnh mẫu";
+            } catch(e) { alert("JSON kịch bản bị lỗi cấu trúc!"); }
+        }
+
+        function renderList() {
+            const list = store.products.filter(p => currentFilter === "All" || p.category === currentFilter);
+            document.getElementById('productList').innerHTML = list.map((p, i) => {
+                const globalIdx = store.products.findIndex(sp => sp.id === p.id);
+                return `
+                <div class="product-card p-4 flex items-center justify-between glass ${p.active ? 'active' : ''}">
+                    <div class="flex items-center gap-3 flex-1" onclick="openEdit(${globalIdx})">
+                        <img src="${p.img}" class="thumb border border-slate-700">
+                        <div class="text-left">
+                            <div class="flex gap-2 items-center">
+                                <span class="text-[7px] bg-slate-800 text-slate-400 px-1 rounded font-bold">${p.category}</span>
+                                <div class="font-black text-[11px] ${p.active ? 'text-red-500' : 'text-slate-500'} uppercase">${p.name}</div>
+                            </div>
+                            <div class="text-[8px] text-slate-500 font-bold uppercase">${p.scripts.length} câu kịch bản</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <input type="checkbox" ${p.active ? 'checked' : ''} onchange="toggleActive(${globalIdx})" class="w-6 h-6 accent-red-600">
+                        <button onclick="deleteProduct(${globalIdx})" class="text-slate-700 p-2"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        // --- CÁC HÀM CƠ BẢN ---
+        function sync() {
+            localStorage.setItem('ngao_v22_pro_' + currentUser, JSON.stringify(store));
+            renderCategories();
+            renderList();
+        }
+
+        function toggleActive(i) { store.products[i].active = !store.products[i].active; sync(); }
+        function deleteProduct(i) { if(confirm('Xóa sản phẩm này?')) { store.products.splice(i, 1); sync(); } }
+
         function updateUI() {
             document.getElementById('rateVal').innerText = document.getElementById('voiceRate').value;
-            document.getElementById('pitchVal').innerText = document.getElementById('voicePitch').value;
-            ttsCloud.volume = document.getElementById('voiceVol').value;
-            document.getElementById('voiceVolVal').innerText = Math.round(ttsCloud.volume * 100) + "%";
-        }
-
-        function updateMusicVol() {
-            const vol = document.getElementById('musicVol').value;
-            bgMusic.volume = vol;
-            document.getElementById('volVal').innerText = Math.round(vol * 100) + "%";
-        }
-
-        function setMode(mode) {
-            currentMode = mode;
-            document.getElementById('modeOnline').classList.toggle('active', mode === 'online');
-            document.getElementById('modeOffline').classList.toggle('active', mode === 'offline');
-            document.getElementById('offlineConfig').classList.toggle('hidden', mode === 'online');
+            document.getElementById('voiceVolVal').innerText = Math.round(document.getElementById('voiceVol').value * 100) + "%";
         }
 
         function loadVoices() {
@@ -217,25 +277,28 @@
         }
         window.speechSynthesis.onvoiceschanged = loadVoices;
 
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('modeOnline').className = mode === 'online' ? 'bg-red-600 p-3 rounded-2xl text-[10px] font-bold uppercase text-white' : 'bg-slate-800 p-3 rounded-2xl text-[10px] font-bold uppercase';
+            document.getElementById('modeOffline').className = mode === 'offline' ? 'bg-red-600 p-3 rounded-2xl text-[10px] font-bold uppercase text-white' : 'bg-slate-800 p-3 rounded-2xl text-[10px] font-bold uppercase';
+        }
+
         function speak(text, callback) {
             const cleanText = text.replace(/giá/gi, "cành").replace(/000/g, " ngàn");
             const rate = document.getElementById('voiceRate').value;
-            const vVol = document.getElementById('voiceVol').value;
-            const useMusic = document.getElementById('useMusic').checked;
-
-            if (useMusic) bgMusic.volume = 0.05; 
+            const vol = document.getElementById('voiceVol').value;
 
             if (currentMode === 'online') {
                 ttsCloud.src = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleanText)}&tl=vi&client=tw-ob&ttsspeed=${rate}`;
-                ttsCloud.volume = vVol;
+                ttsCloud.volume = vol;
                 ttsCloud.play().catch(callback);
-                ttsCloud.onended = () => { if(useMusic) bgMusic.volume = document.getElementById('musicVol').value; callback(); };
+                ttsCloud.onended = callback;
             } else {
                 window.speechSynthesis.cancel();
                 const msg = new SpeechSynthesisUtterance(cleanText);
                 msg.voice = voices[document.getElementById('voiceSelect').value];
-                msg.rate = rate; msg.volume = vVol;
-                msg.onend = () => { if(useMusic) bgMusic.volume = document.getElementById('musicVol').value; callback(); };
+                msg.rate = rate; msg.volume = vol;
+                msg.onend = callback;
                 window.speechSynthesis.speak(msg);
             }
         }
@@ -245,12 +308,11 @@
             const btn = document.getElementById('btnStart');
             if(isLive) {
                 btn.innerText = 'DỪNG TREO'; btn.classList.replace('bg-red-600', 'bg-slate-800');
-                if (document.getElementById('useMusic').checked && bgMusic.src) bgMusic.play();
                 worker.postMessage({ action: 'start', interval: document.getElementById('interval').value });
                 runNext();
             } else {
                 btn.innerText = 'BẮT ĐẦU TREO LIVE'; btn.classList.replace('bg-slate-800', 'bg-red-600');
-                bgMusic.pause(); ttsCloud.pause(); window.speechSynthesis.cancel();
+                window.speechSynthesis.cancel();
                 worker.postMessage({ action: 'stop' });
             }
         }
@@ -258,7 +320,7 @@
         let isSpeaking = false;
         function runNext() {
             if (!isLive || isSpeaking) return;
-            const active = db.filter(p => p.active);
+            const active = store.products.filter(p => p.active);
             if (active.length > 0) {
                 isSpeaking = true;
                 const p = active[Math.floor(Math.random() * active.length)];
@@ -267,87 +329,32 @@
             }
         }
 
-        function testLine(btn, text) {
-            const icon = btn.querySelector('i');
-            icon.classList.replace('fa-play', 'fa-spinner'); icon.classList.add('fa-spin');
-            speak(text, () => {
-                icon.classList.replace('fa-spinner', 'fa-play'); icon.classList.remove('fa-spin');
-            });
-        }
-
-        function processImport() {
-            const name = document.getElementById('newPName').value;
-            let raw = document.getElementById('newPJson').value.trim();
-            if(!name || !raw) return alert("Thiếu tên hoặc kịch bản!");
-            try {
-                if(!raw.startsWith('[')) raw = '[' + raw + ']';
-                const scripts = JSON.parse(raw).map(i => i.script || i.content || i.mo_ta || (typeof i === 'string' ? i : "")).filter(s => s);
-                db.push({ id: Date.now(), name, img: tempImg || "https://placehold.co/50x50", active: true, scripts });
-                sync();
-                document.getElementById('newPName').value = ""; document.getElementById('newPJson').value = "";
-                document.getElementById('imgStatus').innerText = "TẢI ẢNH"; tempImg = "";
-            } catch(e) { alert("JSON lỗi!"); }
+        function previewImg(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => { tempImg = e.target.result; document.getElementById('imgStatus').innerText = "ĐÃ NHẬN ẢNH"; };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
         function openEdit(idx) {
             editIdx = idx;
-            const p = db[idx];
+            const p = store.products[idx];
             document.getElementById('editTitle').innerText = p.name;
             document.getElementById('scriptItems').innerHTML = p.scripts.map((s, i) => `
-                <div class="flex gap-2 bg-slate-900 p-3 rounded-2xl border border-slate-800 items-start">
-                    <textarea class="flex-1 bg-transparent text-[11px] outline-none h-20 text-white">${s}</textarea>
-                    <div class="flex flex-col gap-2">
-                        <button onclick="testLine(this, this.parentElement.parentElement.querySelector('textarea').value)" class="bg-blue-600 w-8 h-8 rounded-lg text-[10px] text-white"><i class="fas fa-play"></i></button>
-                        <button onclick="removeLine(${i})" class="bg-red-900/50 w-8 h-8 rounded-lg text-[10px] text-red-500"><i class="fas fa-trash"></i></button>
-                    </div>
+                <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800">
+                    <textarea class="w-full bg-transparent text-[11px] outline-none h-20 text-white">${s}</textarea>
                 </div>
             `).join('');
             document.getElementById('editModal').classList.remove('hidden');
         }
 
-        function removeLine(i) {
-            const items = document.querySelectorAll('#scriptItems > div');
-            items[i].remove();
-        }
-
         function saveEdit() {
             const texts = Array.from(document.querySelectorAll('#scriptItems textarea')).map(t => t.value);
-            db[editIdx].scripts = texts;
+            store.products[editIdx].scripts = texts;
             sync(); closeEdit();
         }
-
         function closeEdit() { document.getElementById('editModal').classList.add('hidden'); }
-
-        function renderList() {
-            document.getElementById('productList').innerHTML = db.map((p, i) => `
-                <div class="product-card p-4 flex items-center justify-between glass ${p.active ? 'active' : ''}">
-                    <div class="flex items-center gap-3 flex-1" onclick="openEdit(${i})">
-                        <img src="${p.img}" class="thumb border border-slate-700">
-                        <div class="text-left">
-                            <div class="font-black text-[11px] ${p.active ? 'text-red-500' : 'text-slate-500'} uppercase">${p.name}</div>
-                            <div class="text-[8px] text-slate-500 font-bold">${p.scripts.length} CÂU KỊCH BẢN</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <input type="checkbox" ${p.active ? 'checked' : ''} onchange="toggleActive(${i})" class="w-6 h-6 accent-red-600">
-                        <button onclick="deleteProduct(${i})" class="text-slate-700 p-2"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function previewImg(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => { tempImg = e.target.result; document.getElementById('imgStatus').innerText = "ĐÃ CÓ ẢNH"; };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-        function toggleActive(i) { db[i].active = !db[i].active; sync(); }
-        function deleteProduct(i) { if(confirm('Xóa sản phẩm này?')) { db.splice(i, 1); sync(); } }
-        function toggleSettings() { document.getElementById('settingsPanel')?.classList.toggle('hidden'); }
-        function openStudio() { window.open(miniLink, 'Studio', 'width=900,height=700'); }
-        function loadMusic(e) { if (e.target.files[0]) bgMusic.src = URL.createObjectURL(e.target.files[0]); }
     </script>
 </body>
 </html>
